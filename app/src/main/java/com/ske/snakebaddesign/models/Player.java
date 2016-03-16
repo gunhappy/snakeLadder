@@ -5,21 +5,24 @@ package com.ske.snakebaddesign.models;
  */
 public class Player {
     private String name;
-    private  int position;
+    private Piece piece;
+    private Die die;
 
     public Player(String name) {
         this.name = name;
-    }
-
-    public void setPosition(int position){
-        this.position = position;
+        piece = new Piece();
+        die = new Die();
     }
 
     public String getName() {
         return name;
     }
 
-    public int getPosition() {
-        return position;
+    public Piece getPiece() {
+        return piece;
+    }
+
+    public int rollDice(){
+        return die.roll();
     }
 }

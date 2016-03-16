@@ -7,6 +7,8 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.ske.snakebaddesign.models.Board;
+
 public class BoardView extends View {
 
     // Graphics variables
@@ -17,14 +19,14 @@ public class BoardView extends View {
     private float playerSize;
     private int colorP1 = Color.WHITE;
     private int colorP2 = Color.BLACK;
-    private int colorBG = Color.parseColor("#6d8d46");
-    private int colorCell = Color.parseColor("#87aa4c");
+    private int colorBG = Color.WHITE;
     private int colorText = Color.parseColor("#cfe8a6");
 
     // These variables will be used to keep track of what to render
     private int boardSize;
     private int p1Position;
     private int p2Position;
+    private Board board;
 
     public BoardView(Context context) {
         super(context);
@@ -91,14 +93,14 @@ public class BoardView extends View {
     }
 
     private void drawSquares(Canvas canvas) {
-
         for(int i = 0; i < boardSize; i++) {
             for(int j = 0; j < boardSize; j++) {
+                int index = j*boardSize+i;
                 float startX = i * cellSize + padding/2;
                 float startY = j * cellSize + padding/2;
                 float endX = startX + cellSize - padding;
                 float endY = startY + cellSize - padding;
-                paint.setColor(colorCell);
+                paint.setColor(board.getSquareList().get(index).getColor());
                 canvas.drawRect(startX, startY, endX, endY, paint);
                 paint.setColor(colorText);
                 String label = (j *  boardSize + i + 1) + "";
@@ -126,6 +128,10 @@ public class BoardView extends View {
 
     private int positionToCol(int position) {
         return position % boardSize;
+    }
+
+    public void setBoard(Board board){
+        this.board = board;
     }
 
 }

@@ -5,22 +5,25 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.ske.snakebaddesign.R;
 import com.ske.snakebaddesign.guis.BoardView;
+import com.ske.snakebaddesign.models.DataDialog;
+import com.ske.snakebaddesign.models.Die;
+import com.ske.snakebaddesign.models.Game;
+import com.ske.snakebaddesign.models.Player;
 
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Random;
 
-public class GameActivity extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity implements Observer{
 
-    private int boardSize;
-    private int p1Position;
-    private int p2Position;
-    private int turn;
-
+    private Game game;
     private BoardView boardView;
     private Button buttonTakeTurn;
     private Button buttonRestart;
@@ -36,91 +39,31 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        resetGame();
+        game.resetGame();
     }
 
     private void initComponents() {
+        game = new Game();
+        game.addObserver(this);
         boardView = (BoardView) findViewById(R.id.board_view);
+        boardView.setBoard(game.getBoard());
+        boardView.setBoardSize(game.getBoard().getBoardSize());
         buttonTakeTurn = (Button) findViewById(R.id.button_take_turn);
         buttonTakeTurn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                takeTurn();
+                game.takeTurn();
             }
         });
         buttonRestart = (Button) findViewById(R.id.button_restart);
         buttonRestart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                resetGame();
+                game.resetGame();
             }
         });
         textPlayerTurn = (TextView) findViewById(R.id.text_player_turn);
-    }
-
-    private void resetGame() {
-        turn = 0;
-        p1Position = 0;
-        p2Position = 0;
-        boardSize = 6;
-        boardView.setBoardSize(boardSize);
-        boardView.setP1Position(p1Position);
-        boardView.setP2Position(p2Position);
-    }
-
-    private void takeTurn() {
-        final int value = 1 + new Random().nextInt(6);
-        String title = "You rolled a die";
-        String msg = "You got " + value;
-        OnClickListener listener = new OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                moveCurrentPiece(value);
-                dialog.dismiss();
-            }
-        };
-        displayDialog(title, msg, listener);
-    }
-
-    private void moveCurrentPiece(int value) {
-        if (turn % 2 == 0) {
-            p1Position = adjustPosition(p1Position, value);
-            boardView.setP1Position(p1Position);
-            textPlayerTurn.setText("Player 2's Turn");
-        } else {
-            p2Position = adjustPosition(p2Position, value);
-            boardView.setP2Position(p2Position);
-            textPlayerTurn.setText("Player 1's Turn");
-        }
-        checkWin();
-        turn++;
-    }
-
-    private int adjustPosition(int current, int distance) {
-        current = current + distance;
-        int maxSquare = boardSize * boardSize - 1;
-        if(current > maxSquare) {
-            current = maxSquare - (current - maxSquare);
-        }
-        return current;
-    }
-
-    private void checkWin() {
-        String title = "Game Over";
-        String msg = "";
-        OnClickListener listener = new OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                resetGame();
-                dialog.dismiss();
-            }
-        };
-        if (p1Position == boardSize * boardSize - 1) {
-            msg = "Player 1 won!";
-        } else if (p2Position == boardSize * boardSize - 1) {
-            msg = "Player 2 won!";
-        } else {
-            return;
-        }
-        displayDialog(title, msg, listener);
+        textPlayerTurn.setText(game.getPlayer1().getName() + "'s Turn");
     }
 
     private void displayDialog(String title, String message, DialogInterface.OnClickListener listener) {
@@ -132,4 +75,20 @@ public class GameActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    @Override
+    public void update(Observable observable, Object data) {
+        if(data == null) { //update position from Game
+            boardView.setP1Position(game.getPlayer1().getPiece().getPosition());
+            boardView.setP2Position(game.getPlayer2().getPiece().getPosition());
+        }
+
+        else if(data.getClass() == String.class){
+            textPlayerTurn.setText(data.toString());
+        }
+
+        else { // Display dialog
+            DataDialog d = (DataDialog) data;
+            displayDialog(d.getTitle(), d.getMessage(), d.getListener());
+        }
+    }
 }

@@ -20,8 +20,8 @@ public class Game extends Observable {
     }
 
     private void initComponent(){
-        player1 = new Player("Gun");
-        player2 = new Player("Paii");
+        player1 = new Player("Player1");
+        player2 = new Player("Player2");
         board = new Board(8);
         turn = 0;
     }
@@ -32,6 +32,8 @@ public class Game extends Observable {
         turn = 0;
         setChanged();
         notifyObservers();
+        setChanged();
+        notifyObservers(getPlayer1().getName()+"'s Turn");
     }
 
     public int rollDice(){

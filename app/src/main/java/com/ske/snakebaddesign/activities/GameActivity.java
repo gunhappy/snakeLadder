@@ -47,7 +47,6 @@ public class GameActivity extends AppCompatActivity implements Observer{
         game.addObserver(this);
         boardView = (BoardView) findViewById(R.id.board_view);
         boardView.setBoard(game.getBoard());
-        boardView.setBoardSize(game.getBoard().getBoardSize());
         buttonTakeTurn = (Button) findViewById(R.id.button_take_turn);
         buttonTakeTurn.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -23,7 +23,6 @@ public class BoardView extends View {
     private int colorText = Color.parseColor("#cfe8a6");
 
     // These variables will be used to keep track of what to render
-    private int boardSize;
     private int p1Position;
     private int p2Position;
     private Board board;
@@ -57,11 +56,6 @@ public class BoardView extends View {
         drawPlayerPieces(canvas);
     }
 
-    public void setBoardSize(int boardSize) {
-        this.boardSize = boardSize;
-        postInvalidate();
-    }
-
     public void setP1Position(int p1Position) {
         this.p1Position = p1Position;
         postInvalidate();
@@ -73,7 +67,6 @@ public class BoardView extends View {
     }
 
     private void init() {
-        boardSize = 1;
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setTextSize(20);
         paint.setTextAlign(Paint.Align.CENTER);
@@ -82,7 +75,7 @@ public class BoardView extends View {
 
     private void reloadViewDimensions() {
         viewWidth = getWidth();
-        cellSize = (viewWidth / boardSize);
+        cellSize = (viewWidth / board.getBoardSize());
         padding = 0.05f * cellSize;
         playerSize = cellSize/8;
     }
@@ -93,9 +86,9 @@ public class BoardView extends View {
     }
 
     private void drawSquares(Canvas canvas) {
-        for(int i = 0; i < boardSize; i++) {
-            for(int j = 0; j < boardSize; j++) {
-                int index = j*boardSize+i;
+        for(int i = 0; i < board.getBoardSize(); i++) {
+            for(int j = 0; j < board.getBoardSize(); j++) {
+                int index = j*board.getBoardSize()+i;
                 float startX = i * cellSize + padding/2;
                 float startY = j * cellSize + padding/2;
                 float endX = startX + cellSize - padding;
@@ -103,7 +96,7 @@ public class BoardView extends View {
                 paint.setColor(board.getSquareList().get(index).getColor());
                 canvas.drawRect(startX, startY, endX, endY, paint);
                 paint.setColor(colorText);
-                String label = (j *  boardSize + i + 1) + "";
+                String label = (j *  board.getBoardSize() + i + 1) + "";
                 canvas.drawText(label, startX + cellSize/2 - padding/2, startY + cellSize/2, paint);
             }
         }
@@ -123,11 +116,11 @@ public class BoardView extends View {
     }
 
     private int positionToRow(int position) {
-        return position / boardSize;
+        return position / board.getBoardSize();
     }
 
     private int positionToCol(int position) {
-        return position % boardSize;
+        return position % board.getBoardSize();
     }
 
     public void setBoard(Board board){
